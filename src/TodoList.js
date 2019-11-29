@@ -1,24 +1,66 @@
 import React, { Component } from "react";
 import Todo from "./Todo";
+import { connect } from "react-redux";
 
-export default class TodoList extends Component {
+class TodoList extends Component {
   constructor(props) {
     super(props);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleChange = this.handleChange.bind(this);
     this.state = {
-      todos: ["Learn", "Read", "Write"]
+      task: ""
     };
+  }
+  handleSubmit(e) {
+    e.preventDefault();
+    this.props.dispatch({
+      type: "ADD_TODO",
+      task: this.state.task
+    });
+    e.target.reset();
+  }
+  handleChange(e) {
+    this.setState({
+      [e.target.name]: e.target.value
+    })
+  }
+  removeTodo(id) {
+    this.props.dispatch({
+      type: "REMOVE_TODO",
+      id
+    });
   }
   render() {
     debugger;
-    let todos = this.state.todos.map((task, index) => (
-      <Todo task={task} key={index} />
+    let todos = this.props.todos.map((val, index) => (
+      <Todo
+        removeTodo={this.removeTodo.bind(this, val.id)}
+        task={val.task}
+        key={index}
+      />
     ));
     return (
       <div>
-        <ul>
-          {todos}
-        </ul>
+        <form onSubmit={this.handleSubmit}>
+          <label htmlFor="task">Task</label>
+          <input
+            type: "text"
+            name: "task
+            id: "task"
+            onChange: {this.handleChange}
+          />
+          <button>Add a ToDo!</button>
+        </form>
+        <ul>{todos}</ul>
       </div>
     );
   }
 }
+
+function mapStateToProps(reduxState) {    //to connect react with redux
+  return {
+    todos: reduxState.todos
+  };
+}
+
+export default connect(mapStateToProps)(TodoList);
